@@ -24,10 +24,3 @@ BIG3（スクワット・ベンチプレス・デッドリフト）の履歴、�
 2027-03-01,D,220
 ```
 
-## GitHub Pages への公開
-
-1. GitHubで空のリポジトリを作成します。
-2. このフォルダ内のファイルをリポジトリにpushします。
-3. GitHubのリポジトリ画面で `Settings` -> `Pages` を開きます。
-4. `Build and deployment` の `Source` を `Deploy from a branch` にし、`main` ブランチの `/(root)` を選んで保存します。
-5. 数分後に表示されるURLで公開されます。
