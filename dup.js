@@ -12,7 +12,7 @@ const LIFTS = ["squat", "bench", "deadlift"], CODES = { S: "squat", B: "bench", 
 const load = (p) => { const [r, s] = SCHEME[p]; return (p * r * s) / 100; };
 const tCell = (p) => { const [r, s] = SCHEME[p]; return `${p}% x ${r}r x ${s}s = ${load(p).toFixed(2)}`; };
 const round = (kg) => Math.round(kg / 2.5) * 2.5;
-const pCell = (p, max) => { const [r, s] = SCHEME[p], kg = round((max * p) / 100); return `${kg}kg x ${r}r x ${s}s = ${kg * r * s}`; };
+const pCell = (p, max) => { const [r, s] = SCHEME[p], kg = round((max * p) / 100); return `${kg}kg x ${r}r x ${s}s`; };
 const head = "<tr><th>week</th><th>day</th><th>s</th><th>b</th><th>d</th></tr>";
 function rows(fn) { return TEMPLATE.map((days, w) => days.map((ints, d) => `<tr>${d === 0 ? `<th rowspan="2">${fn.week(w)}</th>` : ""}<th>day${d + 1}</th>${ints.map((p, i) => `<td>${fn.cell(p, i)}</td>`).join("")}</tr>`).join("")).join(""); }
 function weekLabel(w) { const d = new Date(`${START}T12:00:00`); d.setDate(d.getDate() + w * 7); return `week${w + 1}<br><small>${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}〜</small>`; }
@@ -37,6 +37,6 @@ $("checks").innerHTML = checks.map(([t, ok]) => `<li>${ok ? "OK" : "NG"}: ${t}</
 fetch("data.csv").then((r) => r.text()).then((text) => {
   const max = {};
   text.trim().split(/\r?\n/).slice(1).forEach((line) => { const [, c, kg] = line.split(",").map((v) => v.trim()); if (CODES[c] && kg !== "") max[CODES[c]] = Math.max(max[CODES[c]] || 0, Number(kg)); });
-  $("base-info").innerHTML = `基準日: ${START.replaceAll("-", "/")} (Mon) = cycle1 / week1 / day1<br>現時点のmax: S ${max.squat}kg / B ${max.bench}kg / D ${max.deadlift}kg(data.csvの最大値を1RMとして使用)<br>セルは「kg x rep x set = 総負荷(kg)」`;
+  $("base-info").innerHTML = `基準日: ${START.replaceAll("-", "/")} (Mon) = cycle1 / week1 / day1<br>現時点のmax: S ${max.squat}kg / B ${max.bench}kg / D ${max.deadlift}kg(data.csvの最大値を1RMとして使用)<br>セルは「kg x rep x set」`;
   $("plan-table").innerHTML = head + rows({ week: weekLabel, cell: (p, i) => pCell(p, max[LIFTS[i]]) });
 }).catch(() => { $("base-info").textContent = "data.csv の読み込みに失敗しました"; });
