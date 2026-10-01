@@ -11,7 +11,7 @@ const TEMPLATE = [
 const LIFTS = ["squat", "bench", "deadlift"], CODES = { S: "squat", B: "bench", D: "deadlift" };
 const load = (p) => { const [r, s] = SCHEME[p]; return (p * r * s) / 100; };
 const tCell = (p) => { const [r, s] = SCHEME[p]; return `${p}% x ${r}r x ${s}s = ${load(p).toFixed(2)}`; };
-const round = (kg) => Math.round(kg / 2.5) * 2.5;
+const UNIT = 2.5, round = (kg) => Math.round(kg / UNIT) * UNIT;
 const pCell = (p, max) => { const [r, s] = SCHEME[p], kg = round((max * p) / 100); return `${kg}kg x ${r}r x ${s}s`; };
 const head = "<tr><th>week</th><th>day</th><th>s</th><th>b</th><th>d</th></tr>";
 function rows(fn) { return TEMPLATE.map((days, w) => days.map((ints, d) => `<tr>${d === 0 ? `<th rowspan="2">${fn.week(w)}</th>` : ""}<th>day${d + 1}</th>${ints.map((p, i) => `<td>${fn.cell(p, i)}</td>`).join("")}</tr>`).join("")).join(""); }
@@ -37,6 +37,14 @@ $("checks").innerHTML = checks.map(([t, ok]) => `<li>${ok ? "OK" : "NG"}: ${t}</
 fetch("data.csv").then((r) => r.text()).then((text) => {
   const max = {};
   text.trim().split(/\r?\n/).slice(1).forEach((line) => { const [, c, kg] = line.split(",").map((v) => v.trim()); if (CODES[c] && kg !== "") max[CODES[c]] = Math.max(max[CODES[c]] || 0, Number(kg)); });
+  const rc = [], names = { squat: "S", bench: "B", deadlift: "D" };
+  LIFTS.forEach((l) => {
+    const kgs = ps.map((p) => round((max[l] * p) / 100)), tl = ps.map((p, i) => kgs[i] * SCHEME[p][0] * SCHEME[p][1]);
+    rc.push([`${names[l]}: 丸め後の総負荷(kg x r x s) ${Math.min(...tl)}〜${Math.max(...tl)}(最小/最大 = ${(ratio(tl) * 100).toFixed(0)}%)`, ratio(tl) >= 0.8]);
+    rc.push([`${names[l]}: 丸め後も強度が高いほど総負荷が少ない(強度85→60%: ${tl.join(" < ")})`, tl.every((v, i) => i === 0 || v > tl[i - 1])]);
+  });
+  rc.push([`全重量が${UNIT}kg単位`, LIFTS.every((l) => ps.every((p) => round((max[l] * p) / 100) % UNIT === 0))]);
+  $("checks").innerHTML += rc.map(([t, ok]) => `<li>${ok ? "OK" : "NG"}(丸め後): ${t}</li>`).join("");
   $("base-info").innerHTML = `基準日: ${START.replaceAll("-", "/")} (Mon) = cycle1 / week1 / day1<br>現時点のmax: S ${max.squat}kg / B ${max.bench}kg / D ${max.deadlift}kg(data.csvの最大値を1RMとして使用)<br>セルは「kg x rep x set」`;
   $("plan-table").innerHTML = head + rows({ week: weekLabel, cell: (p, i) => pCell(p, max[LIFTS[i]]) });
 }).catch(() => { $("base-info").textContent = "data.csv の読み込みに失敗しました"; });
