@@ -7,9 +7,9 @@ https://avocadoisi.github.io/big3-tracker/
 
 ## Training Plan
 
-`plan.html` は DUP（Daily Undulating Periodization）のトレーニング計画ページです。
+`plan.html` は現在のトレーニング計画(kgの表)と、時代ごとの歩みのページです。現在の方式は `plan.js` の `CURRENT` で決め、組み方の解説は `programs/` の方式ページ(現在は `programs/dup.html`)にあります。
 
 - 基準日 2026/10/5 (Mon) を cycle1 / week1 / day1 とし、`data.csv` の各種目の最大値を max として計画を算出します。
-- 週2day x 4週間を1サイクルとし、rep は 3〜10、重量は 2.5kg 単位に丸めます。
-- 総負荷（% x rep x set）は強度が違ってもほぼ同じにし（ゆらぎ20%以内）、強度が高いほど少なくします。丸め後の重量でも同じ条件を検証します。
-- テンプレート、根拠、背景はページ内に記載しています。計画ロジックは `plan.js` にあります。
+- 重量は 2.5kg 単位に丸め、丸め後の重量でもルールを検証します。
+
+方式の追加方法や拡張指針は [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) を参照してください。

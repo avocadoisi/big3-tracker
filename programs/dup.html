@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DUP | Strength Log</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="topbar"><a class="brand" href="../index.html">STRENGTH LOG</a><a class="brand" href="../plan.html">← TRAINING PLAN</a></header>
+
+      <section class="panel doc">
+        <h2>DUP (Daily Undulating Periodization)</h2>
+        <p class="note">1週の中で強度と rep/set を日ごとに変える方式。参考: <a href="https://www.youtube.com/watch?v=JN8Gv8A6c8s" target="_blank" rel="noopener">参考動画 (YouTube)</a></p>
+      </section>
+
+      <section class="panel doc">
+        <h2>template</h2>
+        <p class="note">セルは「強度% x rep x set = 総負荷(% x rep x set / 100)」。計画の重量は max x % を 2.5kg 単位に丸めて算出。</p>
+        <div class="table-wrap"><table id="template-table" class="big"></table></div>
+        <h3>強度ごとの rep x set</h3>
+        <div class="table-wrap"><table id="scheme-table"></table></div>
+      </section>
+
+      <section class="panel doc">
+        <h2>設計ルール</h2>
+        <h3>前提</h3>
+        <ul>
+          <li>repは3〜10repの範囲で行う。</li>
+          <li>週2day、4週間で1サイクル。</li>
+        </ul>
+        <h3>組み方</h3>
+        <ul>
+          <li>強度が高いときはrepが少なくsetが多い。強度が低いときはrepが多くsetが少ない。</li>
+          <li>S・B・Dをすべて行うので、3つとも重い日は作らない。各dayに高・中・低強度を1種目ずつ割り当てる。</li>
+        </ul>
+        <h3>総負荷</h3>
+        <ul>
+          <li>総負荷 = 1RMの% x rep x set(÷100)。</li>
+          <li>強度が違っても総負荷は基本的に同じになるようにする。</li>
+          <li>強度が高い日の方が総負荷を微妙に少なくする(強度が上がるほど総負荷が単調に減る)。</li>
+          <li>総負荷のゆらぎは20%以内(最小 ÷ 最大 ≧ 80%)に抑える。</li>
+        </ul>
+        <h3>重量の丸め</h3>
+        <ul>
+          <li>最小単位は2.5kg。重量は max x % を2.5kg単位に丸める。</li>
+          <li>丸め後の重量で総負荷(kg x rep x set)を計算し直し、種目ごとに「ゆらぎ20%以内」「強度が高いほど総負荷が少ない」を満たすか検証する(下の「ルールの検証」に表示)。</li>
+        </ul>
+      </section>
+
+      <section class="panel doc">
+        <h2>ルールの検証</h2>
+        <ul id="checks"></ul>
+        <h3>メモ</h3>
+        <ul>
+          <li>75%・55%は、整数のrep x setでは「単調に減る」「ゆらぎ20%以内」を両立できないため使わない。</li>
+          <li>第2・3週の85%が連続する。Hの回数はS=3, B=3, D=2回。</li>
+        </ul>
+      </section>
+    </main>
+    <script src="../common.js"></script>
+    <script src="dup.js"></script>
+    <script>renderProgramPage(PROGRAMS.dup);</script>
+  </body>
+</html>

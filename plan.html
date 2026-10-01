@@ -12,64 +12,27 @@
       <header class="topbar"><a class="brand" href="index.html">STRENGTH LOG</a><a class="brand" href="index.html">← TOP</a></header>
 
       <section class="panel doc">
-        <h2>1. 直近のトレーニング計画</h2>
+        <h2>直近のトレーニング計画</h2>
+        <p class="note" id="program-info"></p>
         <p class="note" id="base-info"></p>
         <div class="table-wrap"><table id="plan-table" class="big"></table></div>
       </section>
 
       <section class="panel doc">
-        <h2>2. 計画を算出する template</h2>
-        <p class="note">セルは「強度% x rep x set = 総負荷(% x rep x set / 100)」。計画の重量は max × % を 2.5kg 単位に丸めて算出。</p>
-        <div class="table-wrap"><table id="template-table" class="big"></table></div>
-      </section>
-
-      <section class="panel doc">
-        <h2>3. template の根拠</h2>
-        <h3>前提</h3>
-        <ul>
-          <li>repは3〜10repの範囲で行う。</li>
-          <li>週2day、4週間で1サイクル。</li>
-        </ul>
-        <h3>組み方</h3>
-        <ul>
-          <li>強度が高いときはrepが少なくsetが多い。強度が低いときはrepが多くsetが少ない。</li>
-          <li>S・B・Dをすべて行うので、3つとも重い日は作らない。各dayに高・中・低強度を1種目ずつ割り当てる。</li>
-        </ul>
-        <h3>総負荷</h3>
-        <ul>
-          <li>総負荷 = 1RMの% x rep x set(÷100)。</li>
-          <li>強度が違っても総負荷は基本的に同じになるようにする。</li>
-          <li>強度が高い日の方が総負荷を微妙に少なくする(強度が上がるほど総負荷が単調に減る)。</li>
-          <li>総負荷のゆらぎは20%以内(最小 ÷ 最大 ≧ 80%)に抑える。</li>
-        </ul>
-        <h3>重量の丸め</h3>
-        <ul>
-          <li>最小単位は2.5kg。重量は max x % を2.5kg単位に丸める。</li>
-          <li>丸め後の重量で総負荷(kg x rep x set)を計算し直し、種目ごとに「ゆらぎ20%以内」「強度が高いほど総負荷が少ない」を満たすか検証する(下の「ルールの検証」に表示)。</li>
-        </ul>
-        <h3>強度ごとの rep x set</h3>
-        <div class="table-wrap"><table id="scheme-table"></table></div>
-        <h3>ルールの検証</h3>
-        <ul id="checks"></ul>
-        <h3>メモ</h3>
-        <ul>
-          <li>75%・55%は、整数のrep x setでは「単調に減る」「ゆらぎ20%以内」を両立できないため使わない。</li>
-          <li>第2・3週の85%が連続する。Hの回数はS=3, B=3, D=2回。</li>
-        </ul>
-      </section>
-      <section class="panel doc">
-        <h2>4. 背景: 時代ごとの歩み</h2>
+        <h2>時代ごとの歩み</h2>
         <h3>適当時代 (2025/09〜2026/04)</h3>
         <ul>
           <li>2025/09にトレーニングを始めた。決まったメニューなしで、その日の気分で行っていた。</li>
         </ul>
         <h3>555時代 (2026/05〜2026/09)</h3>
+        <p class="note"><a href="programs/555.html">555のルールを見る →</a></p>
         <ul>
           <li>5rep x 3setで重量を上げていく方式を採用した。</li>
           <li>採用理由: 適当時代は毎回違う重さをやっていたので、成長(プログレッシブオーバーロード)を測ることが難しいと考えたため。</li>
           <li>9月まで順調に伸びたが、限界を感じてきた。</li>
         </ul>
         <h3>DUP時代 (2026/10〜)</h3>
+        <p class="note"><a href="programs/dup.html">DUPの組み方を見る →</a></p>
         <ul>
           <li>採用理由: 555で限界を感じたので変えたい。</li>
           <li>プログラムをやってみたかった。</li>
@@ -97,6 +60,8 @@
       </section>
 
     </main>
+    <script src="common.js"></script>
+    <script src="programs/dup.js"></script>
     <script src="plan.js"></script>
   </body>
 </html>
