@@ -1,6 +1,8 @@
 // 最適化ロジック。DOM非依存(common.js の load/kgLoad/ratio/round を使用)。
 const OPT = { P: [85, 80, 70, 65, 60], R: [3, 10], S: [3, 6], MIN_RATIO: 0.8, BASE: { 85: [3, 6], 80: [4, 5], 70: [8, 3], 65: [9, 3], 60: [10, 3] } };
-const BASE_T = [[80, 70, 60], [60, 80, 70], [70, 65, 85], [85, 70, 65], [65, 85, 70], [70, 65, 85], [80, 70, 60], [60, 80, 70]];
+// seed付き乱数 (mulberry32)
+function makeRng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const shuffle = (a, rng) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const mono = (a) => a.every((v, i) => i === 0 || v > a[i - 1]);
 
 // スキーム(強度ごとの rep x set)を単調鎖の枝刈りDFSで厳密に探索する。
@@ -19,11 +21,11 @@ function checkScheme(scheme, lifts, max, names = SHORT) {
   });
   return checks;
 }
-function bestScheme(lifts, max, names) {
+function bestScheme(lifts, max, names, rng) {
   const cands = [];
   for (let r = OPT.R[0]; r <= OPT.R[1]; r++) for (let s = OPT.S[0]; s <= OPT.S[1]; s++) cands.push([r, s]);
   const baseDist = (scheme) => scheme.reduce((d, c) => d + Math.abs(c.r - OPT.BASE[c.p][0]) + Math.abs(c.s - OPT.BASE[c.p][1]), 0);
-  let best = null;
+  let best = null, ties = 1;
   const eps = [];
   // 85%から60%へ。rep非減少・set非増加・総負荷増加で枝刈り。
   (function dfs(i, acc) {
@@ -38,7 +40,8 @@ function bestScheme(lifts, max, names) {
   const pool = eps.length ? eps : [OPT.P.map((p) => ({ p, r: OPT.BASE[p][0], s: OPT.BASE[p][1] }))];
   for (const sch of pool) {
     const checks = checkScheme(sch, lifts, max, names), n = checks.filter((x) => x[1]).length, d = baseDist(sch);
-    if (!best || n > best.n || (n === best.n && d < best.d)) best = { sch, checks, n, d };
+    if (!best || n > best.n || (n === best.n && d < best.d)) { best = { sch, checks, n, d }; ties = 1; }
+    else if (n === best.n && d === best.d && rng() < 1 / ++ties) best = { sch, checks, n, d };
   }
   return best;
 }
@@ -52,27 +55,33 @@ function placementScore(grid, scheme, k) {
   if (ratio(days) < OPT.MIN_RATIO) pen += 500 + (OPT.MIN_RATIO - ratio(days)) * 1000;
   grid.forEach((d, s) => { if (s) d.forEach((p, l) => { if (p === grid[s - 1][l]) pen += 1000; }); });
   for (let l = 0; l < k; l++) { const cnt = OPT.P.map((p) => grid.filter((d) => d[l] === p).length); pen += (Math.max(...cnt) - Math.min(...cnt)) * 5; }
-  grid.forEach((d, s) => d.forEach((p, l) => { if (p !== (BASE_T[s % BASE_T.length][l])) pen += 1; }));
   return pen;
 }
-function placeCells(scheme, k, n) {
-  let grid = Array.from({ length: n }, (_, s) => Array.from({ length: k }, (_, l) => BASE_T[s % BASE_T.length][l]));
-  let cur = placementScore(grid, scheme, k), improved = true;
-  while (improved) {
-    improved = false;
-    for (let s = 0; s < n; s++) for (let l = 0; l < k; l++) for (const p of OPT.P) {
-      if (grid[s][l] === p) continue;
-      const old = grid[s][l]; grid[s][l] = p;
-      const sc = placementScore(grid, scheme, k);
-      if (sc < cur) { cur = sc; improved = true; } else grid[s][l] = old;
+function placeCells(scheme, k, n, rng) {
+  let bestGrid = null, bestScore = Infinity;
+  for (let run = 0; run < 30; run++) {
+    const grid = Array.from({ length: n }, () => Array.from({ length: k }, () => OPT.P[Math.floor(rng() * OPT.P.length)]));
+    let cur = placementScore(grid, scheme, k), improved = true;
+    const cellsIdx = []; for (let s = 0; s < n; s++) for (let l = 0; l < k; l++) cellsIdx.push([s, l]);
+    while (improved) {
+      improved = false;
+      for (const [s, l] of shuffle(cellsIdx, rng)) for (const p of shuffle(OPT.P.slice(), rng)) {
+        if (grid[s][l] === p) continue;
+        const old = grid[s][l]; grid[s][l] = p;
+        const sc = placementScore(grid, scheme, k);
+        if (sc < cur) { cur = sc; improved = true; } else grid[s][l] = old;
+      }
     }
+    if (cur < bestScore) { bestScore = cur; bestGrid = grid.map((d) => d.slice()); }
+    if (cur === 0) break;
   }
-  return grid;
+  return bestGrid;
 }
 
-function generatePlan(lifts, max, sessions, names = SHORT) {
-  const { sch, checks } = bestScheme(lifts, max, names), byP = Object.fromEntries(sch.map((c) => [c.p, c]));
-  const grid = placeCells(sch, lifts.length, sessions), cells = grid.map((d) => d.map((p) => byP[p]));
+function generatePlan(lifts, max, sessions, names = SHORT, seed = 1) {
+  const rng = makeRng(seed);
+  const { sch, checks } = bestScheme(lifts, max, names, rng), byP = Object.fromEntries(sch.map((c) => [c.p, c]));
+  const grid = placeCells(sch, lifts.length, sessions, rng), cells = grid.map((d) => d.map((p) => byP[p]));
   const days = cells.map((d) => d.reduce((s, c) => s + load(c), 0));
   const extra = [
     [`${sessions}day`, cells.length === sessions],
@@ -80,5 +89,5 @@ function generatePlan(lifts, max, sessions, names = SHORT) {
     ["各dayに80%以上は最大1種目", cells.every((d) => d.filter((c) => c.p >= 80).length <= 1)],
     [`dayの合計 最小/最大 = ${(ratio(days) * 100).toFixed(0)}%`, ratio(days) >= OPT.MIN_RATIO],
   ];
-  return { sessions: cells, scheme: sch, checks: checks.concat(extra) };
+  return { seed, sessions: cells, scheme: sch, checks: checks.concat(extra) };
 }

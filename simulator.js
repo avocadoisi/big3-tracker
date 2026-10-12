@@ -5,13 +5,15 @@ function readInput() {
   const max = {}; lifts.forEach((l) => { max[l] = Number($(`max-${l}`).value); });
   return { lifts, max, sessions: Number($("sessions").value) };
 }
-function run() {
+function run(newSeed) {
   const { lifts, max, sessions } = readInput();
   if (!lifts.length) return void ($("sim-message").textContent = "種目を1つ以上選んでください。");
   if (lifts.some((l) => !(max[l] > 0 && max[l] <= 400))) return void ($("sim-message").textContent = "maxは0より大きく400以下で入力してください。");
   if (!(Number.isInteger(sessions) && sessions >= 1 && sessions <= 32)) return void ($("sim-message").textContent = "生成数は1〜32の整数にしてください。");
   $("sim-message").textContent = "";
-  renderResult(generatePlan(lifts, max, sessions, Object.fromEntries(lifts.map((l) => [l, $(`name-${l}`).value.trim() || SHORT[l]]))), lifts, max);
+  if (newSeed && !$("seed-fixed").checked) $("seed").value = Math.floor(Math.random() * 1e9);
+  if ($("seed").value === "") $("seed").value = 1;
+  renderResult(generatePlan(lifts, max, sessions, Object.fromEntries(lifts.map((l) => [l, $(`name-${l}`).value.trim() || SHORT[l]])), Number($("seed").value)), lifts, max);
 }
 function renderResult(plan, lifts, max) {
   const name = (l) => $(`name-${l}`).value.trim() || SHORT[l];
@@ -21,6 +23,6 @@ function renderResult(plan, lifts, max) {
 }
 loadMax().then((m) => Object.assign(DEFAULT_MAX, m)).catch(() => {}).then(() => {
   LIFTS.forEach((l) => { $(`max-${l}`).value = DEFAULT_MAX[l]; });
-  run();
+  run(false);
 });
-$("sim-form").addEventListener("submit", (e) => { e.preventDefault(); run(); });
+$("sim-form").addEventListener("submit", (e) => { e.preventDefault(); run(true); });
