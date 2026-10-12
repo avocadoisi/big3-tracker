@@ -50,6 +50,7 @@ function placementScore(grid, scheme, k) {
   const days = grid.map((d) => d.reduce((s, p) => s + load(byP[p]), 0));
   grid.forEach((d) => { pen += Math.max(0, d.filter((p) => p >= 80).length - 1) * 1000; });
   if (ratio(days) < OPT.MIN_RATIO) pen += 500 + (OPT.MIN_RATIO - ratio(days)) * 1000;
+  grid.forEach((d, s) => { if (s) d.forEach((p, l) => { if (p === grid[s - 1][l]) pen += 1000; }); });
   for (let l = 0; l < k; l++) { const cnt = OPT.P.map((p) => grid.filter((d) => d[l] === p).length); pen += (Math.max(...cnt) - Math.min(...cnt)) * 5; }
   grid.forEach((d, s) => d.forEach((p, l) => { if (p !== (BASE_T[s % BASE_T.length][l])) pen += 1; }));
   return pen;
@@ -75,6 +76,7 @@ function generatePlan(lifts, max, sessions, names = SHORT) {
   const days = cells.map((d) => d.reduce((s, c) => s + load(c), 0));
   const extra = [
     [`${sessions}day`, cells.length === sessions],
+    ["同じ種目で2回連続して同じ強度にしない", cells.every((d, s) => !s || d.every((c, l) => c.p !== cells[s - 1][l].p))],
     ["各dayに80%以上は最大1種目", cells.every((d) => d.filter((c) => c.p >= 80).length <= 1)],
     [`dayの合計 最小/最大 = ${(ratio(days) * 100).toFixed(0)}%`, ratio(days) >= OPT.MIN_RATIO],
   ];
