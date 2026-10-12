@@ -6,6 +6,7 @@
 |---|---|
 | `index.html` / `app.js` | 記録とグラフ |
 | `plan.html` / `plan.js` | 現在の計画(kgの表)と、時代ごとの歩み |
+| `simulator.html` / `simulator.js` / `optimizer.js` | DUPシミュレータ(UIと、DOM非依存の最適化ロジック) |
 | `programs/<id>.html` | 方式ごとの解説(template、設計ルール、ルールの検証) |
 | `common.js` | 共通ヘルパと `PROGRAMS` レジストリ |
 | `programs/555.html` | 過去の方式の例。計算を持たない静的な解説のみ(js不要) |
