@@ -21,6 +21,8 @@
             <label><input type="checkbox" name="lift" value="deadlift" checked /> <input type="text" id="name-deadlift" value="D" size="8" /> <input type="number" id="max-deadlift" min="0" max="400" step="2.5" /></label>
           </fieldset>
           <label>生成数(周期内セッション数 1〜32) <input type="number" id="sessions" min="1" max="32" step="1" value="8" /></label>
+          <label>seed <input type="number" id="seed" min="0" step="1" /></label>
+          <label><input type="checkbox" id="seed-fixed" /> seed固定</label>
           <button type="submit" id="generate">生成</button>
         </form>
         <p class="note" id="sim-message"></p>
@@ -38,6 +40,7 @@
           <li>セル・dayごとの総負荷の最小/最大 ≥ 80%。</li>
           <li>強度が高いほど総負荷が少ない(単調)。丸め後(2.5kg単位)も同様。</li>
           <li>強度が下がるほど rep は非減少、set は非増加。</li>
+          <li>配置はseed付きの乱数で探索する。「生成」を押すたびに新しいseedで計算し直す(seed固定で同じ結果を再現)。</li>
           <li>全ては満たせない場合、満たすチェック数を最大化し、同点なら基準DUP表に近い方を採用する。</li>
         </ul>
       </section>
