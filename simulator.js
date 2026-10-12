@@ -8,8 +8,8 @@ function readInput() {
 function run() {
   const { lifts, max, sessions } = readInput();
   if (!lifts.length) return void ($("sim-message").textContent = "種目を1つ以上選んでください。");
-  if (lifts.some((l) => !(max[l] > 0))) return void ($("sim-message").textContent = "maxを入力してください。");
-  if (!(Number.isInteger(sessions) && sessions >= 1 && sessions <= 16)) return void ($("sim-message").textContent = "生成数は1〜16の整数にしてください。");
+  if (lifts.some((l) => !(max[l] > 0 && max[l] <= 400))) return void ($("sim-message").textContent = "maxは0より大きく400以下で入力してください。");
+  if (!(Number.isInteger(sessions) && sessions >= 1 && sessions <= 32)) return void ($("sim-message").textContent = "生成数は1〜32の整数にしてください。");
   $("sim-message").textContent = "";
   renderResult(generatePlan(lifts, max, sessions, Object.fromEntries(lifts.map((l) => [l, $(`name-${l}`).value.trim() || SHORT[l]]))), lifts, max);
 }
