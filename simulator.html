@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DUP Simulator | Strength Log</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="topbar"><a class="brand" href="index.html">STRENGTH LOG</a><a class="brand" href="plan.html">← PLAN</a></header>
+
+      <section class="panel doc">
+        <h2>DUPシミュレータ</h2>
+        <form id="sim-form" class="sim-form">
+          <fieldset>
+            <legend>種目 / max (kg)</legend>
+            <label><input type="checkbox" name="lift" value="squat" checked /> S <input type="number" id="max-squat" min="1" step="2.5" /></label>
+            <label><input type="checkbox" name="lift" value="bench" checked /> B <input type="number" id="max-bench" min="1" step="2.5" /></label>
+            <label><input type="checkbox" name="lift" value="deadlift" checked /> D <input type="number" id="max-deadlift" min="1" step="2.5" /></label>
+          </fieldset>
+          <label>生成数(周期内セッション数・偶数 2〜16) <input type="number" id="sessions" min="2" max="16" step="2" value="8" /></label>
+          <button type="submit" id="generate">生成</button>
+        </form>
+        <p class="note" id="sim-message"></p>
+        <div class="table-wrap"><table id="sim-table" class="big"></table></div>
+        <ul id="sim-checks"></ul>
+      </section>
+
+      <section class="panel doc rules">
+        <h2>生成ルール・制約</h2>
+        <ul class="dim">
+          <li>種目は最大3、生成数は偶数(2日/週 x 生成数/2 週)。</li>
+          <li>強度は 85 / 80 / 70 / 65 / 60% の5段。rep は 3〜10、set は 3〜6。</li>
+          <li>各dayに80%以上は最大1種目。</li>
+          <li>セル・dayごとの総負荷の最小/最大 ≥ 80%。</li>
+          <li>強度が高いほど総負荷が少ない(単調)。丸め後(2.5kg単位)も同様。</li>
+          <li>強度が下がるほど rep は非減少、set は非増加。</li>
+          <li>全ては満たせない場合、満たすチェック数を最大化し、同点なら基準DUP表に近い方を採用する。</li>
+        </ul>
+      </section>
+    </main>
+    <script src="common.js"></script>
+    <script src="optimizer.js"></script>
+    <script src="simulator.js"></script>
+  </body>
+</html>
