@@ -16,11 +16,11 @@
         <form id="sim-form" class="sim-form">
           <fieldset>
             <legend>種目 / max (kg)</legend>
-            <label><input type="checkbox" name="lift" value="squat" checked /> S <input type="number" id="max-squat" min="1" step="2.5" /></label>
-            <label><input type="checkbox" name="lift" value="bench" checked /> B <input type="number" id="max-bench" min="1" step="2.5" /></label>
-            <label><input type="checkbox" name="lift" value="deadlift" checked /> D <input type="number" id="max-deadlift" min="1" step="2.5" /></label>
+            <label><input type="checkbox" name="lift" value="squat" checked /> <input type="text" id="name-squat" value="S" size="8" /> <input type="number" id="max-squat" min="0" step="2.5" /></label>
+            <label><input type="checkbox" name="lift" value="bench" checked /> <input type="text" id="name-bench" value="B" size="8" /> <input type="number" id="max-bench" min="0" step="2.5" /></label>
+            <label><input type="checkbox" name="lift" value="deadlift" checked /> <input type="text" id="name-deadlift" value="D" size="8" /> <input type="number" id="max-deadlift" min="0" step="2.5" /></label>
           </fieldset>
-          <label>生成数(周期内セッション数・偶数 2〜16) <input type="number" id="sessions" min="2" max="16" step="2" value="8" /></label>
+          <label>生成数(周期内セッション数 1〜16) <input type="number" id="sessions" min="1" max="16" step="1" value="8" /></label>
           <button type="submit" id="generate">生成</button>
         </form>
         <p class="note" id="sim-message"></p>
@@ -31,7 +31,7 @@
       <section class="panel doc rules">
         <h2>生成ルール・制約</h2>
         <ul class="dim">
-          <li>種目は最大3、生成数は偶数(2日/週 x 生成数/2 週)。</li>
+          <li>種目は最大3、生成数(日数)は1〜16。</li>
           <li>強度は 85 / 80 / 70 / 65 / 60% の5段。rep は 3〜10、set は 3〜6。</li>
           <li>各dayに80%以上は最大1種目。</li>
           <li>セル・dayごとの総負荷の最小/最大 ≥ 80%。</li>

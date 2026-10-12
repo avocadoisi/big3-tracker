@@ -5,7 +5,7 @@ const mono = (a) => a.every((v, i) => i === 0 || v > a[i - 1]);
 
 // スキーム(強度ごとの rep x set)を単調鎖の枝刈りDFSで厳密に探索する。
 // 満たすチェック数(丸め後を含む)最大、同点は基準表との差が小さいものを返す。
-function checkScheme(scheme, lifts, max) {
+function checkScheme(scheme, lifts, max, names = SHORT) {
   const loads = scheme.map(load), checks = [
     [`rep ${OPT.R[0]}〜${OPT.R[1]}、set ${OPT.S[0]}〜${OPT.S[1]}の範囲内`, scheme.every((c) => c.r >= OPT.R[0] && c.r <= OPT.R[1] && c.s >= OPT.S[0] && c.s <= OPT.S[1])],
     [`セルの総負荷 最小/最大 = ${(ratio(loads) * 100).toFixed(0)}%`, ratio(loads) >= OPT.MIN_RATIO],
@@ -14,12 +14,12 @@ function checkScheme(scheme, lifts, max) {
   ];
   lifts.forEach((l) => {
     const tl = scheme.map((c) => kgLoad(c, max[l]));
-    checks.push([`(丸め後) ${SHORT[l]}: 総負荷 最小/最大 = ${(ratio(tl) * 100).toFixed(0)}%`, ratio(tl) >= OPT.MIN_RATIO]);
-    checks.push([`(丸め後) ${SHORT[l]}: 強度が高いほど総負荷が少ない`, mono(tl)]);
+    checks.push([`(丸め後) ${names[l]}: 総負荷 最小/最大 = ${(ratio(tl) * 100).toFixed(0)}%`, ratio(tl) >= OPT.MIN_RATIO]);
+    checks.push([`(丸め後) ${names[l]}: 強度が高いほど総負荷が少ない`, mono(tl)]);
   });
   return checks;
 }
-function bestScheme(lifts, max) {
+function bestScheme(lifts, max, names) {
   const cands = [];
   for (let r = OPT.R[0]; r <= OPT.R[1]; r++) for (let s = OPT.S[0]; s <= OPT.S[1]; s++) cands.push([r, s]);
   const baseDist = (scheme) => scheme.reduce((d, c) => d + Math.abs(c.r - OPT.BASE[c.p][0]) + Math.abs(c.s - OPT.BASE[c.p][1]), 0);
@@ -37,7 +37,7 @@ function bestScheme(lifts, max) {
   // 単調鎖が見つかる場合のみ。無ければ基準表を採用。
   const pool = eps.length ? eps : [OPT.P.map((p) => ({ p, r: OPT.BASE[p][0], s: OPT.BASE[p][1] }))];
   for (const sch of pool) {
-    const checks = checkScheme(sch, lifts, max), n = checks.filter((x) => x[1]).length, d = baseDist(sch);
+    const checks = checkScheme(sch, lifts, max, names), n = checks.filter((x) => x[1]).length, d = baseDist(sch);
     if (!best || n > best.n || (n === best.n && d < best.d)) best = { sch, checks, n, d };
   }
   return best;
@@ -69,12 +69,12 @@ function placeCells(scheme, k, n) {
   return grid;
 }
 
-function generatePlan(lifts, max, sessions) {
-  const { sch, checks } = bestScheme(lifts, max), byP = Object.fromEntries(sch.map((c) => [c.p, c]));
+function generatePlan(lifts, max, sessions, names = SHORT) {
+  const { sch, checks } = bestScheme(lifts, max, names), byP = Object.fromEntries(sch.map((c) => [c.p, c]));
   const grid = placeCells(sch, lifts.length, sessions), cells = grid.map((d) => d.map((p) => byP[p]));
   const days = cells.map((d) => d.reduce((s, c) => s + load(c), 0));
   const extra = [
-    [`2day/週 x ${sessions / 2}週間`, true],
+    [`${sessions}day`, cells.length === sessions],
     ["各dayに80%以上は最大1種目", cells.every((d) => d.filter((c) => c.p >= 80).length <= 1)],
     [`dayの合計 最小/最大 = ${(ratio(days) * 100).toFixed(0)}%`, ratio(days) >= OPT.MIN_RATIO],
   ];
