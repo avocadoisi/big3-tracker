@@ -2,7 +2,7 @@
 const CURRENT = "dup";
 const START = "2026-10-05"; // cycle1 / week1 / day1
 const NEXT_START = "2026-11-02"; // cycle2 / week1 / day1 (START から4週後)
-const NEXT_MAX = { squat: 155, bench: 105, deadlift: 185 }; // 次サイクルのmax(指定値)
+const NEXT_MAX = { squat: 152.5, bench: 105, deadlift: 185 }; // 次サイクルのmax(指定値)
 
 const program = PROGRAMS[CURRENT];
 function weekLabel(w, start = START) { const d = new Date(`${start}T12:00:00`); d.setDate(d.getDate() + w * 7); return `week${w + 1}<br><small>${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}〜</small>`; }
