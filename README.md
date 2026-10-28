@@ -13,3 +13,7 @@ https://avocadoisi.github.io/big3-tracker/
 - 重量は 2.5kg 単位に丸め、丸め後の重量でもルールを検証します。
 
 方式の追加方法や拡張指針は [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) を参照してください。
+
+## License
+
+MIT — [LICENSE](LICENSE)
