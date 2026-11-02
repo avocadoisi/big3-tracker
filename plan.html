@@ -13,7 +13,7 @@
       <header class="topbar"><a class="brand" href="index.html">STRENGTH LOG</a><a class="brand" href="index.html">← TOP</a></header>
 
       <section class="panel doc">
-        <h2>直近のトレーニング計画</h2>
+        <h2>今回のトレーニング計画</h2>
         <p class="note" id="program-info"></p>
         <p class="note"><a href="simulator.html">DUPシミュレータ →</a></p>
         <p class="note" id="base-info"></p>
@@ -21,9 +21,15 @@
       </section>
 
       <section class="panel doc">
-        <h2>次のトレーニング計画</h2>
+        <h2>次回のトレーニング計画</h2>
         <p class="note" id="next-base-info"></p>
         <div class="table-wrap"><table id="next-plan-table" class="big"></table></div>
+      </section>
+
+      <section class="panel doc">
+        <h2>終了したサイクル</h2>
+        <p class="note" id="archive-info"></p>
+        <div id="archive"></div>
       </section>
 
       <section class="panel doc">
@@ -47,6 +53,9 @@
           <li>線形ピリオダイゼーションは長期的で拘束力が強いと感じた。</li>
           <li>DUPは、プログラムを導入する最初の一歩として敷居が低いと感じた。</li>
         </ul>
+        <h3>サイクル</h3>
+        <p class="note">4週で1サイクル。終わったサイクルは上の「終了したサイクル」に折りたたんで残す。データは <code>cycles.js</code>。</p>
+        <div class="table-wrap"><table id="cycle-table"></table></div>
         <h3>時代ごとの伸び</h3>
         <div class="table-wrap"><table>
           <tr><th>時代</th><th>期間</th><th>S 開始→終了</th><th>B 開始→終了</th><th>D 開始→終了</th><th>TOTAL 開始→終了</th></tr>
@@ -66,6 +75,7 @@
     </main>
     <script src="common.js"></script>
     <script src="programs/dup.js"></script>
+    <script src="cycles.js"></script>
     <script src="plan.js"></script>
   </body>
 </html>

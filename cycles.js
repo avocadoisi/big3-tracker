@@ -1,0 +1,8 @@
+// サイクルの履歴。最後の要素が今回のサイクル、それより前はアーカイブ(plan.html で折りたたんで表示)。
+// max はサイクル開始時に決める(最終週の高強度日の体感と data.csv の記録から)。data.csv は実際の記録。
+const CYCLES = [
+  { cycle: 1, program: "dup", start: "2026-10-05", max: { squat: 150, bench: 100, deadlift: 180 } },
+  { cycle: 2, program: "dup", start: "2026-11-02", max: { squat: 152.5, bench: 105, deadlift: 185 } },
+];
+// 次のサイクルの max は、今回の max にこの増加量(kg)を足して plan.js が組み立てる。
+const CYCLE_INCREASE = { squat: 2.5, bench: 2.5, deadlift: 5 };
