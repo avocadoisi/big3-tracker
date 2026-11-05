@@ -5,9 +5,9 @@
   // [week][day] = [s, b, d] の強度%
   const T = [
     [[80, 70, 60], [60, 80, 70]],
-    [[70, 65, 85], [85, 70, 65]],
-    [[65, 85, 70], [70, 65, 85]],
-    [[80, 70, 60], [60, 80, 70]],
+    [[70, 65, 80], [60, 85, 65]],
+    [[85, 65, 60], [60, 70, 85]],
+    [[80, 60, 65], [65, 85, 80]],
   ];
   const template = T.map((w) => w.map((d) => d.map(c)));
   const ps = Object.keys(SCHEME).map(Number).sort((a, b) => b - a), schemeCells = ps.map(c);
@@ -15,11 +15,14 @@
     id: "dup", name: "DUP (Daily Undulating Periodization)", page: "programs/dup.html", template,
     schemeRows: () => schemeCells,
     validate() {
-      const cells = template.flat(2), loads = cells.map(load), days = template.flat().map((d) => d.reduce((s, x) => s + load(x), 0)), reps = schemeCells.map((x) => x.r);
+      const cells = template.flat(2), loads = cells.map(load), flat = template.flat(), days = flat.map((d) => d.reduce((s, x) => s + load(x), 0)), reps = schemeCells.map((x) => x.r);
+      const loop2 = [...template[0], ...template[1]], last = flat[flat.length - 1], heavy = flat.map((d) => d.filter((x) => x.p >= 80).length);
       return [
         [`rep ${Math.min(...reps)}〜${Math.max(...reps)}(3〜10の範囲内)`, Math.min(...reps) >= 3 && Math.max(...reps) <= 10],
         ["2day/週 x 4週間", template.length === 4 && template.every((w) => w.length === 2)],
-        ["3種目がすべて重い日がない(各dayに80%以上は最大1種目)", template.flat().every((d) => d.filter((x) => x.p >= 80).length <= 1)],
+        ["80%以上は各day最大1種目(最終日のみB85+D80のピークで2種目)", heavy.every((n, i) => n <= (i === heavy.length - 1 ? 2 : 1)) && last[1].p === 85 && last[2].p === 80],
+        ["week2の次にweek1へ戻る2週ループでも同じ種目で同じ強度が連続しない", loop2.every((d, i) => d.every((c, l) => c.p !== loop2[(i + 1) % loop2.length][l].p))],
+        ["4週間の並びを繰り返しても同じ種目で同じ強度が連続しない", template.flat().every((d, i, seq) => d.every((c, l) => c.p !== seq[(i + 1) % seq.length][l].p))],
         [`セルの総負荷ゆらぎ: ${Math.min(...loads).toFixed(2)}〜${Math.max(...loads).toFixed(2)}(最小/最大 = ${(ratio(loads) * 100).toFixed(0)}%)`, ratio(loads) >= 0.8],
         [`dayの合計: ${Math.min(...days).toFixed(2)}〜${Math.max(...days).toFixed(2)}(最小/最大 = ${(ratio(days) * 100).toFixed(0)}%)`, ratio(days) >= 0.8],
         ["強度が高いほど総負荷が少ない(単調)", schemeCells.every((x, i) => i === 0 || load(x) > load(schemeCells[i - 1]))],

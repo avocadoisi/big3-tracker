@@ -46,14 +46,14 @@ function bestScheme(lifts, max, names, rng) {
   return best;
 }
 
-// 配置: 山登り法(近似)。day内80%以上は最大1種目、day合計の比≥0.8、強度の偏りを小さく、基準表に近づける。
+// 配置: 山登り法(近似)。day内80%以上は最大1種目、day合計の比≥0.8、終端→開始のループを含めて同強度の連続を避ける、強度の偏りを小さく、基準表に近づける。
 function placementScore(grid, scheme, k) {
-  const byP = Object.fromEntries(scheme.map((c) => [c.p, c]));
+  const byP = Object.fromEntries(scheme.map((c) => [c.p, c])), n = grid.length;
   let pen = 0;
   const days = grid.map((d) => d.reduce((s, p) => s + load(byP[p]), 0));
   grid.forEach((d) => { pen += Math.max(0, d.filter((p) => p >= 80).length - 1) * 1000; });
   if (ratio(days) < OPT.MIN_RATIO) pen += 500 + (OPT.MIN_RATIO - ratio(days)) * 1000;
-  grid.forEach((d, s) => { if (s) d.forEach((p, l) => { if (p === grid[s - 1][l]) pen += 1000; }); });
+  if (n > 1) grid.forEach((d, s) => { const prev = grid[(s - 1 + n) % n]; d.forEach((p, l) => { if (p === prev[l]) pen += 1000; }); });
   for (let l = 0; l < k; l++) { const cnt = OPT.P.map((p) => grid.filter((d) => d[l] === p).length); pen += (Math.max(...cnt) - Math.min(...cnt)) * 5; }
   return pen;
 }
@@ -85,7 +85,7 @@ function generatePlan(lifts, max, sessions, names = SHORT, seed = 1) {
   const days = cells.map((d) => d.reduce((s, c) => s + load(c), 0));
   const extra = [
     [`${sessions}day`, cells.length === sessions],
-    ["同じ種目で2回連続して同じ強度にしない", cells.every((d, s) => !s || d.every((c, l) => c.p !== cells[s - 1][l].p))],
+    ["同じ種目で2回連続して同じ強度にしない(終端→開始のループを含む)", cells.length < 2 || cells.every((d, s) => d.every((c, l) => c.p !== cells[(s + 1) % cells.length][l].p))],
     ["各dayに80%以上は最大1種目", cells.every((d) => d.filter((c) => c.p >= 80).length <= 1)],
     [`dayの合計 最小/最大 = ${(ratio(days) * 100).toFixed(0)}%`, ratio(days) >= OPT.MIN_RATIO],
   ];
