@@ -23,7 +23,6 @@
 PROGRAMS.dup = {
   id, name, page,                 // page は plan.html から見たパス (programs/dup.html)
   template,                       // [week][day][liftIndex(S,B,D)] = { p: 強度%, r: rep, s: set }
-  cell(p),                        // 強度% -> { p, r, s }(cycles.js に固定した template の描画用)
   schemeRows(),                   // 強度ごとの { p, r, s } 一覧(方式ページの表用)
   validate(),                     // 丸め前のルール検証 -> [[説明, ok], ...]
   validateRounded(max),           // 丸め後(2.5kg単位)のルール検証
@@ -32,7 +31,7 @@ PROGRAMS.dup = {
 
 重量は `kgOf(cell, max)`(max x % を 2.5kg に丸める)、丸め後の総負荷は `kgLoad`、template上の総負荷は `load` を使う。
 
-計画表の描画は `rows(program, weekLabel, cellLabel, template)` に template を渡せる。省略すると `program.template`(現在の方式)。`plan.js` は終了したサイクルだけ `cycles.js` の `template`(強度%の並び)を `program.cell(p)` でセルに戻して渡すので、方式の template を変えても過去サイクルの計画は当時のまま残る。
+計画表の描画は `rows(program, weekLabel, cellLabel, template)` に template を渡せる。省略すると `program.template`(現在の方式)。`plan.js` は終了したサイクルだけ `cycles.js` の `template` を渡すので、方式の template や `SCHEME` を変えても過去サイクルの計画は当時のまま残る。
 
 ## 方式を切り替える・追加する手順
 
@@ -46,7 +45,7 @@ PROGRAMS.dup = {
 
 1. 終わったサイクルの記録を `data.csv` に足す。
 2. `cycles.js` の末尾に新しいサイクルを足す。開始日は前サイクルの開始日 + 4週、max は前サイクルの max + `CYCLE_INCREASE`(種目ごとの増加量)。
-3. 終わったサイクルには、その時点の `program.template` の強度%を `template` としてコピーして固定する(`cycles.js`)。固定しないと、方式の template を変えたときに過去サイクルの計画まで書き換わる。
+3. 終わったサイクルには、その時点の `program.template` のセル(`{ p, r, s }`)を `template` としてコピーして固定する(`cycles.js`)。固定しないと、方式の template や `SCHEME` を変えたときに過去サイクルの計画まで書き換わる。
 4. 終わったサイクルは自動で `plan.html` の「終了したサイクル」に折りたたまれる。`cycles.js` からは消さない(アーカイブはここが保存先)。
 5. 増加量を変えるときは `cycles.js` の `CYCLE_INCREASE` を変える。サイクルごとに変えたい場合は増加量をサイクルの要素に持たせる。
 

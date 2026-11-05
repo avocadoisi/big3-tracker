@@ -13,7 +13,6 @@
   const ps = Object.keys(SCHEME).map(Number).sort((a, b) => b - a), schemeCells = ps.map(c);
   PROGRAMS.dup = {
     id: "dup", name: "DUP (Daily Undulating Periodization)", page: "programs/dup.html", template,
-    cell: c,                       // 強度% -> { p, r, s }(cycles.js に固定した template の描画用)
     schemeRows: () => schemeCells,
     validate() {
       const cells = template.flat(2), loads = cells.map(load), flat = template.flat(), days = flat.map((d) => d.reduce((s, x) => s + load(x), 0)), reps = schemeCells.map((x) => x.r);
