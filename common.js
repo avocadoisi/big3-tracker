@@ -9,8 +9,9 @@ const kgOf = (c, max) => round((max * c.p) / 100);          // 丸め後の重�
 const kgLoad = (c, max) => kgOf(c, max) * c.r * c.s;        // 丸め後の総負荷 (kg x r x s)
 const head = "<tr><th>week</th><th>day</th><th>s</th><th>b</th><th>d</th></tr>";
 // program.template[week][day][liftIndex] = { p, r, s }
-function rows(program, weekLabel, cellLabel) {
-  return program.template.map((days, w) => days.map((cells, d) => `<tr>${d === 0 ? `<th rowspan="${days.length}">${weekLabel(w)}</th>` : ""}<th>day${d + 1}</th>${cells.map((c, i) => `<td>${cellLabel(c, i)}</td>`).join("")}</tr>`).join("")).join("");
+// template を省略すると program.template(現在の方式)。終了したサイクルは cycles.js に固定した template を渡す。
+function rows(program, weekLabel, cellLabel, template = program.template) {
+  return template.map((days, w) => days.map((cells, d) => `<tr>${d === 0 ? `<th rowspan="${days.length}">${weekLabel(w)}</th>` : ""}<th>day${d + 1}</th>${cells.map((c, i) => `<td>${cellLabel(c, i)}</td>`).join("")}</tr>`).join("")).join("");
 }
 function loadMax(base = "") {
   return fetch(`${base}data.csv`).then((r) => r.text()).then((text) => {
