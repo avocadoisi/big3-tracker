@@ -6,7 +6,7 @@
 |---|---|
 | `index.html` / `app.js` | 記録とグラフ |
 | `plan.html` / `plan.js` | 今回・次回の計画(kgの表)、終了したサイクル(折りたたみ)、時代ごとの歩み |
-| `cycles.js` | サイクル履歴(番号、開始日、max)。最後が今回、それより前がアーカイブ |
+| `cycles.js` | サイクル履歴(番号、開始日、max、終了したサイクルの template)。最後が今回、それより前がアーカイブ |
 | `simulator.html` / `simulator.js` / `optimizer.js` | DUPシミュレータ(UIと、DOM非依存の最適化ロジック) |
 | `programs/<id>.html` | 方式ごとの解説(template、設計ルール、ルールの検証) |
 | `common.js` | 共通ヘルパと `PROGRAMS` レジストリ |
@@ -31,6 +31,8 @@ PROGRAMS.dup = {
 
 重量は `kgOf(cell, max)`(max x % を 2.5kg に丸める)、丸め後の総負荷は `kgLoad`、template上の総負荷は `load` を使う。
 
+計画表の描画は `rows(program, weekLabel, cellLabel, template)` に template を渡せる。省略すると `program.template`(現在の方式)。`plan.js` は終了したサイクルだけ `cycles.js` の `template` を渡すので、方式の template や `SCHEME` を変えても過去サイクルの計画は当時のまま残る。
+
 ## 方式を切り替える・追加する手順
 
 1. `programs/<id>.js` を作り、`PROGRAMS.<id>` を登録する。
@@ -43,8 +45,9 @@ PROGRAMS.dup = {
 
 1. 終わったサイクルの記録を `data.csv` に足す。
 2. `cycles.js` の末尾に新しいサイクルを足す。開始日は前サイクルの開始日 + 4週、max は前サイクルの max + `CYCLE_INCREASE`(種目ごとの増加量)。
-3. 終わったサイクルは自動で `plan.html` の「終了したサイクル」に折りたたまれる。`cycles.js` からは消さない(アーカイブはここが保存先)。
-4. 増加量を変えるときは `cycles.js` の `CYCLE_INCREASE` を変える。サイクルごとに変えたい場合は増加量をサイクルの要素に持たせる。
+3. 終わったサイクルには、その時点の `program.template` のセル(`{ p, r, s }`)を `template` としてコピーして固定する(`cycles.js`)。固定しないと、方式の template や `SCHEME` を変えたときに過去サイクルの計画まで書き換わる。
+4. 終わったサイクルは自動で `plan.html` の「終了したサイクル」に折りたたまれる。`cycles.js` からは消さない(アーカイブはここが保存先)。
+5. 増加量を変えるときは `cycles.js` の `CYCLE_INCREASE` を変える。サイクルごとに変えたい場合は増加量をサイクルの要素に持たせる。
 
 ## 今後の拡張指針: 線形ピリオダイゼーション
 

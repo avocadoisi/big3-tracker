@@ -24,9 +24,10 @@ function weekLabel(w, start) {
   return `week${w + 1}<br><small>${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}〜</small>`;
 }
 // 方式がテンプレートを持つ場合だけ計画表を返す(555 のような静的ページのみの方式は空)
+// 終了したサイクルは cycles.js に固定した template(当時のセル)で描く。無ければ現在の方式の template。
 function planTable(c) {
   const program = PROGRAMS[c.program];
-  return program ? head + rows(program, (w) => weekLabel(w, c.start), (cell, i) => `${kgOf(cell, c.max[LIFTS[i]])}kg x ${cell.r}r x ${cell.s}s`) : "";
+  return program ? head + rows(program, (w) => weekLabel(w, c.start), (cell, i) => `${kgOf(cell, c.max[LIFTS[i]])}kg x ${cell.r}r x ${cell.s}s`, c.template || program.template) : "";
 }
 function cycleInfo(c) {
   const program = PROGRAMS[c.program];
