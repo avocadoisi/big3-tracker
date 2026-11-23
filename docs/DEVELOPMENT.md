@@ -10,10 +10,20 @@
 | `simulator.html` / `simulator.js` / `optimizer.js` | DUPシミュレータ(UIと、DOM非依存の最適化ロジック) |
 | `programs/<id>.html` | 方式ごとの解説(template、設計ルール、ルールの検証) |
 | `common.js` | 共通ヘルパと `PROGRAMS` レジストリ |
+| `theme.js` | テーマ(dark / light)の切り替えと保存 |
 | `programs/555.html` | 過去の方式の例。計算を持たない静的な解説のみ(js不要) |
 | `programs/<id>.js` | 方式の定義(template、検証)。`PROGRAMS.<id>` に登録 |
 
 `plan.html` は「今回・次回の計画」「終了したサイクル」「時代の履歴」を持つ。組み方の解説は方式ページに置き、plan からリンクする。
+
+## テーマ(dark / light)
+
+色は `style.css` の `:root`(dark)と `:root[data-theme="light"]` の CSS 変数だけで決める。`theme.js` が `html` の `data-theme` を切り替え、選択を `localStorage` の `big3-theme` に保存する。未選択のときは OS の `prefers-color-scheme` に従い、OS 側の変更にも追従する。
+
+- 新しい色を足すときは、色を直接書かず `:root` と `:root[data-theme="light"]` の両方に変数を定義する。
+- `theme.js` は `head` で同期的に読み込む(描画前にテーマを決めてちらつきを防ぐ)。
+- 切り替えボタンは topbar の `.topbar-actions` に `<button class="theme-toggle" type="button" data-theme-toggle>` を置く。ラベルは `theme.js` が埋める。
+- 新しいページを作るときも、`<head>` の `style.css` の直後に `theme.js` を読み込む。
 
 ## 方式(program)のインターフェース
 
