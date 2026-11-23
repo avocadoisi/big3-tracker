@@ -25,18 +25,20 @@ test('planRows: 日付は開始日 + week * 7 + day', () => {
   assert.deepEqual(rows.slice(3).map((row) => row.date), ['2026-11-03', '2026-11-03', '2026-11-03']);
 });
 
-test('planRows: 種目だけ・日だけを選べる', () => {
-  const bench = planRows(cycle, template, { lift: 'bench' });
+test('planRows: 選んだ種目だけを、全日ぶん出す', () => {
+  const bench = planRows(cycle, template, ['bench']);
   assert.deepEqual(bench.map((row) => row.date), ['2026-11-02', '2026-11-03']);
   assert.ok(bench.every((row) => row.lift === 'bench'));
 
-  const day2 = planRows(cycle, template, { week: 0, day: 1 });
-  assert.deepEqual(day2.map((row) => row.lift), ['squat', 'bench', 'deadlift']);
-  assert.ok(day2.every((row) => row.date === '2026-11-03'));
+  const two = planRows(cycle, template, ['squat', 'deadlift']);
+  assert.equal(two.length, 4);
+  assert.deepEqual(two.map((row) => row.lift), ['squat', 'deadlift', 'squat', 'deadlift']);
+
+  assert.deepEqual(planRows(cycle, template, []), []);
 });
 
 test('planRows: 重量は 2.5kg に丸め、rep と set はセルのまま', () => {
-  const bench = planRows(cycle, template, { lift: 'bench' });
+  const bench = planRows(cycle, template, ['bench']);
   assert.equal(bench[0].kg, 72.5); // 105 * 70% = 73.5 -> 72.5
   assert.equal(bench[0].reps, 8);
   assert.equal(bench[0].sets, 3);
@@ -45,7 +47,7 @@ test('planRows: 重量は 2.5kg に丸め、rep と set はセルのまま', () 
 
 test('toImport: rep x set を1セット=1レコードに展開する', () => {
   const now = Date.UTC(2026, 10, 1, 0, 0, 0);
-  const data = toImport(planRows(cycle, template, { lift: 'bench' }), now);
+  const data = toImport(planRows(cycle, template, ['bench']), now);
 
   assert.equal(data.schemaVersion, 1);
   assert.equal(data.exportedAt, '2026-11-01T00:00:00.000Z');
