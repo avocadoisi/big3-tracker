@@ -7,6 +7,7 @@
 | `index.html` / `app.js` | 記録とグラフ |
 | `plan.html` / `plan.js` | 今回・次回の計画(kgの表)、終了したサイクル(折りたたみ)、時代ごとの歩み |
 | `cycles.js` | サイクル履歴(番号、開始日、max、終了したサイクルの template)。最後が今回、それより前がアーカイブ |
+| `export.js` | 計画のセルを open-workout-memo のインポート形式へ変換する(DOM 非依存) |
 | `simulator.html` / `simulator.js` / `optimizer.js` | DUPシミュレータ(UIと、DOM非依存の最適化ロジック) |
 | `programs/<id>.html` | 方式ごとの解説(template、設計ルール、ルールの検証) |
 | `common.js` | 共通ヘルパと `PROGRAMS` レジストリ |
@@ -58,6 +59,14 @@ PROGRAMS.dup = {
 3. 終わったサイクルには、その時点の `program.template` のセル(`{ p, r, s }`)を `template` としてコピーして固定する(`cycles.js`)。固定しないと、方式の template や `SCHEME` を変えたときに過去サイクルの計画まで書き換わる。
 4. 終わったサイクルは自動で `plan.html` の「終了したサイクル」に折りたたまれる。`cycles.js` からは消さない(アーカイブはここが保存先)。
 5. 増加量を変えるときは `cycles.js` の `CYCLE_INCREASE` を変える。サイクルごとに変えたい場合は増加量をサイクルの要素に持たせる。
+
+## 計画のエクスポート
+
+`plan.html` の「クリップボードへエクスポート」は、計画のセルを [open-workout-memo](https://github.com/avocadoisi/open-workout-memo) のインポートJSONにしてクリップボードへコピーする。変換は `export.js` の `PlanExport` が持ち、DOM に触れないので `node --test`(`export.test.mjs`)で検証する。
+
+- `planRows(cycle, template, { lift, week, day })` が表の行を作る。`lift` / `week` / `day` に `null` を渡すと「すべて」。日付は `cycle.start` + `week * 7 + day` 日で、計画上の日付を入れる。重量は `round(cycle.max[lift] * p / 100)` で 2.5kg に丸める。
+- `toImport(rows)` が `rep x set` を 1セット=1レコードに展開する。セットの `id` は `plan-<日付>-<種目>-<セット番号>` なので、同じ計画を何度取り込んでも増えない。種目名は open-workout-memo の初期種目(スクワット / ベンチプレス / デッドリフト)に合わせ、同名の種目へ寄せる。
+- 種目は列、日は行に対応する。ベンチだけ一緒にやる相手には「種目=ベンチプレス」「日=すべて」で、その日の予定だけなら「種目=すべて」「日=weekN dayD」で絞る。
 
 ## 今後の拡張指針: 線形ピリオダイゼーション
 
