@@ -59,7 +59,7 @@ $("archive").innerHTML = pastCycles.slice().reverse().map((c) => {
 $("archive-info").textContent = pastCycles.length ? "終了したサイクル(クリックで開く)。maxと計画は当時のまま。" : "";
 
 // --- クリップボードへエクスポート ---
-// 種目(列)と日(行)で絞ったセルを open-workout-memo のインポートJSONにしてコピーする。
+// 種目(列)を選んで、その種目の全日を open-workout-memo のインポートJSONにしてコピーする。
 const exportTargets = [
   { key: "current", cycle: currentCycle, tag: "今回" },
   { key: "next", cycle: nextCycle, tag: "次回" },
@@ -67,45 +67,34 @@ const exportTargets = [
 ].filter((item) => templateOf(item.cycle));
 
 const exportCycle = $("export-cycle");
-const exportLift = $("export-lift");
-const exportDay = $("export-day");
+const exportLifts = $("export-lifts");
 const exportStatus = $("export-status");
 const exportPreview = $("export-preview");
 
 exportCycle.innerHTML = exportTargets.map((item) => `<option value="${item.key}">cycle${item.cycle.cycle} ${item.tag} / ${slash(item.cycle.start)}〜</option>`).join("");
-exportLift.innerHTML = `<option value="">すべて</option>` + LIFTS.map((l) => `<option value="${l}">${SHORT[l]} ${PlanExport.LIFT_INFO[l].name}</option>`).join("");
+exportLifts.innerHTML = LIFTS.map((l) => `<label><input type="checkbox" value="${l}" checked> ${SHORT[l]} ${PlanExport.LIFT_INFO[l].name}</label>`).join("");
 
 function exportTarget() {
   return exportTargets.find((item) => item.key === exportCycle.value) || exportTargets[0];
 }
 
-// サイクルを変えると週数・日数も変わるので、日の選択肢を作り直す
-function renderExportDays() {
-  const { cycle } = exportTarget();
-  const previous = exportDay.value;
-  exportDay.innerHTML = `<option value="">すべて</option>` + templateOf(cycle).flatMap((days, w) => days.map((_, d) => {
-    const date = slash(PlanExport.addDays(cycle.start, w * 7 + d));
-    return `<option value="${w}-${d}">week${w + 1} day${d + 1} (${date})</option>`;
-  })).join("");
-  if ([...exportDay.options].some((option) => option.value === previous)) exportDay.value = previous;
-}
-
 function exportRows() {
   const { cycle } = exportTarget();
-  const [week, day] = exportDay.value ? exportDay.value.split("-").map(Number) : [null, null];
-  return PlanExport.planRows(cycle, templateOf(cycle), { lift: exportLift.value || null, week, day });
+  const lifts = [...exportLifts.querySelectorAll("input:checked")].map((input) => input.value);
+  return PlanExport.planRows(cycle, templateOf(cycle), lifts);
 }
 
 function renderExport() {
   const { tag } = exportTarget();
   const rows = exportRows();
   const sets = rows.reduce((sum, row) => sum + row.sets, 0);
+  const message = rows.length ? `${tag}の計画: ${rows.length}セル / ${sets}セット` : "種目を1つ以上選んでください";
 
   exportPreview.innerHTML = rows.length
     ? "<tr><th>日付</th><th>week</th><th>day</th><th>種目</th><th>重量</th><th>rep</th><th>set</th></tr>" + rows.map((row) =>
       `<tr><td>${slash(row.date)}</td><td>${row.week}</td><td>${row.day}</td><td>${PlanExport.LIFT_INFO[row.lift].name}</td><td>${row.kg}kg</td><td>${row.reps}</td><td>${row.sets}</td></tr>`).join("")
-    : "<tr><td>この条件にセルはありません</td></tr>";
-  exportStatus.textContent = `${tag}の計画: ${rows.length}セル / ${sets}セット`;
+    : `<tr><td>${message}</td></tr>`;
+  exportStatus.textContent = message;
   $("export-copy").disabled = rows.length === 0;
 }
 
@@ -120,10 +109,8 @@ $("export-copy").addEventListener("click", async () => {
     exportStatus.textContent = "コピーできませんでした。ブラウザがクリップボードを許可しているか確認してください。";
   }
 });
-exportCycle.addEventListener("change", () => { renderExportDays(); renderExport(); });
-exportLift.addEventListener("change", renderExport);
-exportDay.addEventListener("change", renderExport);
-renderExportDays();
+exportCycle.addEventListener("change", renderExport);
+exportLifts.addEventListener("change", renderExport);
 renderExport();
 
 // サイクルの一覧(時代ごとの歩みの表)

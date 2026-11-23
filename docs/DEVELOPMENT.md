@@ -64,9 +64,9 @@ PROGRAMS.dup = {
 
 `plan.html` の「クリップボードへエクスポート」は、計画のセルを [open-workout-memo](https://github.com/avocadoisi/open-workout-memo) のインポートJSONにしてクリップボードへコピーする。変換は `export.js` の `PlanExport` が持ち、DOM に触れないので `node --test`(`export.test.mjs`)で検証する。
 
-- `planRows(cycle, template, { lift, week, day })` が表の行を作る。`lift` / `week` / `day` に `null` を渡すと「すべて」。日付は `cycle.start` + `week * 7 + day` 日で、計画上の日付を入れる。重量は `round(cycle.max[lift] * p / 100)` で 2.5kg に丸める。
+- `planRows(cycle, template, lifts)` が表の行を作る。`lifts` は種目名の配列で、`null` ならすべて、空配列なら 0 行。日付は `cycle.start` + `week * 7 + day` 日で、計画上の日付を入れる。重量は `round(cycle.max[lift] * p / 100)` で 2.5kg に丸める。
 - `toImport(rows)` が `rep x set` を 1セット=1レコードに展開する。セットの `id` は `plan-<日付>-<種目>-<セット番号>` なので、同じ計画を何度取り込んでも増えない。種目名は open-workout-memo の初期種目(スクワット / ベンチプレス / デッドリフト)に合わせ、同名の種目へ寄せる。
-- 種目は列、日は行に対応する。ベンチだけ一緒にやる相手には「種目=ベンチプレス」「日=すべて」で、その日の予定だけなら「種目=すべて」「日=weekN dayD」で絞る。
+- 種目は列に対応し、画面のチェックボックス(S / B / D、既定は全部オン)で選ぶ。選んだ種目の全日を出す。ベンチだけ一緒にやる相手にはベンチだけをオンにする。
 
 ## 今後の拡張指針: 線形ピリオダイゼーション
 

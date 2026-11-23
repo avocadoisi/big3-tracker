@@ -18,16 +18,14 @@
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   }
 
-  // 選んだセルを表の行にする。lift は種目名、week/day は 0 起点で、null は「すべて」
-  function planRows(cycle, template, { lift = null, week = null, day = null } = {}) {
+  // 選んだセルを表の行にする。lift は種目名、week/day は 0 起点。lifts が null なら全部
+  function planRows(cycle, template, lifts = null) {
     const rows = [];
     template.forEach((days, w) => {
-      if (week !== null && w !== week) return;
       days.forEach((cells, d) => {
-        if (day !== null && d !== day) return;
         cells.forEach((cell, i) => {
           const name = LIFT_ORDER[i];
-          if (lift !== null && name !== lift) return;
+          if (lifts && !lifts.includes(name)) return;
           rows.push({
             date: addDays(cycle.start, w * 7 + d),
             week: w + 1,

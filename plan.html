@@ -32,8 +32,7 @@
         <p class="note">選んだ計画を open-workout-memo のインポート形式（1セット=1レコード）にしてコピーします。相手のデータ画面で「クリップボードからインポート」を押します。</p>
         <div class="export-controls">
           <label>サイクル<select id="export-cycle"></select></label>
-          <label>種目<select id="export-lift"></select></label>
-          <label>日<select id="export-day"></select></label>
+          <div class="export-lifts" id="export-lifts" role="group" aria-label="種目"></div>
           <button type="button" id="export-copy">JSONをコピー</button>
         </div>
         <p class="note" id="export-status" role="status" aria-live="polite"></p>
