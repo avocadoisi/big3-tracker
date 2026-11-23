@@ -10,10 +10,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
+    <script src="theme.js"></script>
   </head>
   <body>
     <main class="page-shell">
-      <header class="topbar"><a class="brand" href="#top" aria-label="Strength Log ホーム">STRENGTH LOG</a><a class="brand" href="plan.html">TRAINING PLAN →</a><p class="updated" id="updated-label"></p></header>
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="Strength Log ホーム">STRENGTH LOG</a>
+        <div class="topbar-actions">
+          <p class="updated" id="updated-label"></p>
+          <a class="brand" href="plan.html">TRAINING PLAN →</a>
+          <button class="theme-toggle" type="button" data-theme-toggle aria-label="テーマを切り替える">LIGHT</button>
+        </div>
+      </header>
 
       <section class="lift-grid" aria-label="BIG3の現在値">
         <article class="lift-card total">
