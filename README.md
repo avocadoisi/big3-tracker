@@ -12,7 +12,7 @@ https://avocadoisi.github.io/big3-tracker/
 - サイクル(4週)ごとの開始日と max は `cycles.js` に記録します。最後の要素が今回のサイクルで、その max に `CYCLE_INCREASE`(現在は S+2.5kg / B+2.5kg / D+5kg)を足したものが次回の計画です。
 - `data.csv` は実際の記録、`cycles.js` はサイクル開始時に決めた max。終了したサイクルは `plan.html` の「終了したサイクル」に折りたたんで残ります。終了したサイクルは計画(template の強度%と rep x set)も `cycles.js` に固定するので、方式の template や `SCHEME` を変えても当時の計画のまま残ります。
 - 重量は 2.5kg 単位に丸め、丸め後の重量でもルールを検証します。
-- `plan.html` の「クリップボードへエクスポート」は、選んだサイクルと種目(チェックボックス、既定はBig3全部)のセルを [open-workout-memo](https://github.com/avocadoisi/open-workout-memo) のインポート形式(1セット=1レコード)にしてコピーします。相手のデータ画面で「クリップボードからインポート」を押すと取り込めます。
+- `plan.html` の「クリップボードへエクスポート」（既定は閉じた折りたたみ）は、選んだサイクルと種目(チェックボックス、既定はBig3全部)のセルを [open-workout-memo](https://github.com/avocadoisi/open-workout-memo) のインポート形式(1セット=1レコード)にしてコピーします。相手のデータ画面で「クリップボードからインポート」を押すと取り込めます。
 
 方式の追加方法や拡張指針は [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) を参照してください。
 
